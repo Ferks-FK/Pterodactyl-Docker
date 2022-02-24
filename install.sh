@@ -528,6 +528,31 @@ delete_unnecessary_files
 bye
 }
 
+pre_config() {
+echo -e "* What do you want to do?"
+echo -ne "
+1) First installation (${YELLOW}Installs pterodactyl and all necessary dependencies${RESET})
+2) Install a new node (${YELLOW}Installs only a new node for an existing panel${RESET})
+3) Exit
+"
+read -r INICIAL_CHOOSE
+case "$INICIAL_CHOOSE" in
+  1)
+    main
+  ;;
+  2)
+    bash <(curl -s $GITHUB_URL/install_node.sh)
+  ;;
+  3)
+    echo "Bye!"
+    exit 1
+  ;;
+  *)
+    print_error "Invalid Option!"
+  ;;
+esac
+}
+
 install_pterodactyl() {
 print "Starting installation, this may take a few minutes, please wait."
 sleep 3
@@ -663,4 +688,4 @@ bye() {
 }
 
 # Exec Script #
-main
+pre_config
