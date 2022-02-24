@@ -13,8 +13,11 @@ set -e
 #
 ########################################################
 
-LINK_WIKI="https://github.com/Ferks-FK/Pterodactyl-AutoAddons/wiki"
+# Variables #
+
+LINK_WIKI="https://github.com/Ferks-FK/Pterodactyl-Docker/wiki"
 DISPLAY_MENU=true
+
 print_brake() {
   for ((n = 0; n < $1; n++)); do
     echo -n "#"
