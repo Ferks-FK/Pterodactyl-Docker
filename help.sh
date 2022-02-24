@@ -9,7 +9,7 @@ set -e
 #
 #         Created and maintained by Ferks-FK
 #
-#            Protected by GPL 3.0 License
+#            Protected by MIT License
 #
 ########################################################
 

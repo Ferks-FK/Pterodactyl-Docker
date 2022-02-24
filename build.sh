@@ -10,15 +10,15 @@ set -e
 #
 #         Created and maintained by Ferks-FK
 #
-#            Protected by GPL 3.0 License
+#            Protected by MIT License
 #
 ########################################################
 
 #### Fixed Variables ####
 
-SCRIPT_RELEASE="Pterodactyl-Docker"
+SCRIPT_RELEASE="development"
 SUPPORT_LINK="https://discord.gg/buDBbSGJmQ"
-GITHUB_URL="https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-AutoAddons/$SCRIPT_RELEASE"
+GITHUB_URL="https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/$SCRIPT_RELEASE"
 CONFIGURE_SSL=false
 
 print_brake() {
@@ -421,10 +421,10 @@ if [ -d "/var/pterodactyl" ]; then
     /var/pterodactyl/configs/letsencrypt/renewal-hooks/deploy \
     /var/pterodactyl/configs/letsencrypt/renewal-hooks/post \
     /var/pterodactyl/configs/letsencrypt/renewal-hooks/pre
-    curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/features/Pterodactyl-Docker/docker-compose.example.yml
-    curl -so /var/pterodactyl/configs/mariadb.env $GITHUB_URL/features/Pterodactyl-Docker/configs/mariadb.env
-    curl -so /var/pterodactyl/configs/panel.env $GITHUB_URL/features/Pterodactyl-Docker/configs/panel.env
-    curl -so /var/pterodactyl/configs/letsencrypt/cli.ini $GITHUB_URL/features/Pterodactyl-Docker/configs/cli.ini
+    curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/docker-compose.example.yml
+    curl -so /var/pterodactyl/configs/mariadb.env $GITHUB_URL/configs/mariadb.env
+    curl -so /var/pterodactyl/configs/panel.env $GITHUB_URL/configs/panel.env
+    curl -so /var/pterodactyl/configs/letsencrypt/cli.ini $GITHUB_URL/configs/cli.ini
 fi
 }
 
@@ -562,7 +562,7 @@ if [ -d "/var/www/pterodactyl" ]; then
   elif [ -d "/var/pterodactyl" ]; then
     print_warning "You have already used this script to install pterodactyl docker, you cannot install it again."
     echo -e "* Running a help script..."
-    bash <(curl -s $GITHUB_URL/features/Pterodactyl-Docker/help.sh)
+    bash <(curl -s $GITHUB_URL/help.sh)
 fi
 
 # Exec Check Distro #
