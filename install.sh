@@ -235,6 +235,17 @@ if [ "$(systemctl is-active --quiet nginx)" == "active" ]; then
 fi
 }
 
+inicial_checks() {
+# Exec Check Distro #
+check_distro
+
+# Check if the OS is docker compatible #
+check_compatibility
+
+# Check if there are any conflicting processes active #
+check_processes
+}
+
 inicial_deps() {
 print "Downloading packages required for FQDN validation..."
 
@@ -541,6 +552,7 @@ case "$INICIAL_CHOOSE" in
     main
   ;;
   2)
+    inicial_checks
     bash <(curl -s $GITHUB_URL/install_node.sh)
   ;;
   3)
@@ -586,14 +598,8 @@ if [ -d "/var/www/pterodactyl" ]; then
     bash <(curl -s $GITHUB_URL/help.sh)
 fi
 
-# Exec Check Distro #
-check_distro
-
-# Check if the OS is docker compatible #
-check_compatibility
-
-# Check if there are any conflicting processes active #
-check_processes
+# Run all the initial checks #
+inicial_checks
 
 # Set FQDN for panel #
 FQDN=""
