@@ -14,7 +14,7 @@ set -e
 #
 ########################################################
 
-#### Fixed Variables ####
+# Variables #
 
 SCRIPT_RELEASE="development"
 SUPPORT_LINK="https://discord.gg/buDBbSGJmQ"
@@ -235,17 +235,6 @@ if [ "$(systemctl is-active --quiet nginx)" == "active" ]; then
 fi
 }
 
-inicial_checks() {
-# Exec Check Distro #
-check_distro
-
-# Check if the OS is docker compatible #
-check_compatibility
-
-# Check if there are any conflicting processes active #
-check_processes
-}
-
 inicial_deps() {
 print "Downloading packages required for FQDN validation..."
 
@@ -284,6 +273,18 @@ echo -ne "* Would you like to configure ssl for your domain? (y/N): "
 read -r CONFIGURE_SSL
 if [[ "$CONFIGURE_SSL" == [Yy] ]]; then
     CONFIGURE_SSL=true
+fi
+}
+
+configure_ssl() {
+print "Creating SSL certificate for your domain..."
+sleep 2
+
+if [ -d "/etc/letsencrypt/live/$FQDN" ]; then
+    print_warning "There is already an SSL certificate for this domain!"
+  else
+    cd "/var/pterodactyl"
+    sudo docker compose run --rm --service-ports certbot certonly -d "$FQDN"
 fi
 }
 
@@ -429,7 +430,7 @@ mkdir -p /var/pterodactyl \
 /var/pterodactyl/configs/letsencrypt/renewal-hooks/deploy \
 /var/pterodactyl/configs/letsencrypt/renewal-hooks/post \
 /var/pterodactyl/configs/letsencrypt/renewal-hooks/pre
-curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/docker-compose.example.yml
+curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/docker/docker-compose.example.yml
 curl -so /var/pterodactyl/configs/mariadb.env $GITHUB_URL/configs/mariadb.env
 curl -so /var/pterodactyl/configs/panel.env $GITHUB_URL/configs/panel.env
 curl -so /var/pterodactyl/configs/letsencrypt/cli.ini $GITHUB_URL/configs/cli.ini
@@ -552,7 +553,6 @@ case "$INICIAL_CHOOSE" in
     main
   ;;
   2)
-    inicial_checks
     bash <(curl -s $GITHUB_URL/install_node.sh)
   ;;
   3)
@@ -584,6 +584,7 @@ esac
 
 download_essencial_files
 configure_environment
+[ "$CONFIGURE_SSL" == true ] && configure_ssl
 create_docker_container
 }
 
@@ -598,8 +599,14 @@ if [ -d "/var/www/pterodactyl" ]; then
     bash <(curl -s $GITHUB_URL/help.sh)
 fi
 
-# Run all the initial checks #
-inicial_checks
+# Exec Check Distro #
+check_distro
+
+# Check if the OS is docker compatible #
+check_compatibility
+
+# Check if there are any conflicting processes active #
+check_processes
 
 # Set FQDN for panel #
 FQDN=""
