@@ -18,7 +18,15 @@ set -e
 SCRIPT_RELEASE="development"
 SUPPORT_LINK="https://discord.gg/buDBbSGJmQ"
 GITHUB_URL="https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/$SCRIPT_RELEASE"
+LINK_WIKI="https://github.com/Ferks-FK/Pterodactyl-Docker/wiki"
 CONFIGURE_SSL=false
+
+print_brake() {
+  for ((n = 0; n < $1; n++)); do
+    echo -n "#"
+  done
+  echo ""
+}
 
 print_warning() {
   echo ""
@@ -38,21 +46,10 @@ print_success() {
   echo ""
 }
 
-print_hint() {
-  echo ""
-  echo -e "* ${GREEN}HINT${RESET}: $1"
-  echo ""
-}
-
 print() {
   echo ""
   echo -e "* ${GREEN}$1 ${RESET}"
   echo ""
-}
-
-system_input() {
-echo ""
-echo -ne "${GREEN}$1${RESET}> "
 }
 
 hyperlink() {
@@ -357,13 +354,13 @@ fi
 
 # Summary #
 echo
-print_brake 75
+print_brake 40
 echo
 echo -e "* Hostname/FQDN: $FQDN"
 [ "$CONFIGURE_SSL" == true ] && echo -e "* Email Certificate: $EMAIL"
 [ "$CONFIGURE_SSL" == true ] && echo -e "* Configure SSL: $CONFIGURE_SSL"
 echo
-print_brake 75
+print_brake 40
 echo
 
 # Confirm all the choices #
@@ -372,3 +369,21 @@ read -r CONTINUE_INSTALL
 [[ "$CONTINUE_INSTALL" =~ [Yy] ]] && install_daemon
 [[ "$CONTINUE_INSTALL" == [a-xA-X]* ]] && print_error "Installation aborted!" && exit 1
 }
+
+bye() {
+print_brake 90
+  echo
+  echo -e "${GREEN}* The script has finished the installation process!${RESET}"
+
+  [ "$CONFIGURE_SSL" == true ] && APP_URL="https://$FQDN"
+  [ "$CONFIGURE_SSL" == false ] && APP_URL="http://$FQDN"
+  echo -e "${GREEN}* This is the FQDN that you will use in your node configuration: ${YELLOW}$(hyperlink "$APP_URL")${RESET}"
+  echo -e "${GREEN}* Thank you for using this script!"
+  echo -e "* Support Group: ${YELLOW}$(hyperlink "$SUPPORT_LINK")${RESET}"
+  print_warning "The script has installed your node, but it is not configured\nplease visit the wiki to configure it: ${YELLOW}$(hyperlink "$LINK_WIKI")${RESET}"
+  print_brake 90
+  echo
+}
+
+# Exec Script #
+main
