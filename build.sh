@@ -408,24 +408,20 @@ yum install docker-ce docker-ce-cli
 download_essencial_files() {
 print "Downloading essencial files..."
 
-if [ -d "/var/pterodactyl" ]; then
-    print_warning "The essential files have already been downloaded"
-  else
-    mkdir -p /var/pterodactyl \
-    /var/pterodactyl/configs \
-    /var/pterodactyl/configs/certs \
-    /var/pterodactyl/configs/daemon \
-    /var/pterodactyl/configs/letsencrypt \
-    /var/pterodactyl/configs/letsencrypt/renewal-hooks \
-    /var/pterodactyl/configs/letsencrypt/webroot \
-    /var/pterodactyl/configs/letsencrypt/renewal-hooks/deploy \
-    /var/pterodactyl/configs/letsencrypt/renewal-hooks/post \
-    /var/pterodactyl/configs/letsencrypt/renewal-hooks/pre
-    curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/docker-compose.example.yml
-    curl -so /var/pterodactyl/configs/mariadb.env $GITHUB_URL/configs/mariadb.env
-    curl -so /var/pterodactyl/configs/panel.env $GITHUB_URL/configs/panel.env
-    curl -so /var/pterodactyl/configs/letsencrypt/cli.ini $GITHUB_URL/configs/cli.ini
-fi
+mkdir -p /var/pterodactyl \
+/var/pterodactyl/configs \
+/var/pterodactyl/configs/certs \
+/var/pterodactyl/configs/daemon \
+/var/pterodactyl/configs/letsencrypt \
+/var/pterodactyl/configs/letsencrypt/renewal-hooks \
+/var/pterodactyl/configs/letsencrypt/webroot \
+/var/pterodactyl/configs/letsencrypt/renewal-hooks/deploy \
+/var/pterodactyl/configs/letsencrypt/renewal-hooks/post \
+/var/pterodactyl/configs/letsencrypt/renewal-hooks/pre
+curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/docker-compose.example.yml
+curl -so /var/pterodactyl/configs/mariadb.env $GITHUB_URL/configs/mariadb.env
+curl -so /var/pterodactyl/configs/panel.env $GITHUB_URL/configs/panel.env
+curl -so /var/pterodactyl/configs/letsencrypt/cli.ini $GITHUB_URL/configs/cli.ini
 }
 
 configure_environment() {
