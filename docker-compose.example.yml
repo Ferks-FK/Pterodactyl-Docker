@@ -1,0 +1,116 @@
+version: '3.4'
+services:
+  mysql:
+    image: docker.io/library/mariadb:10.6
+    env_file: ./configs/mariadb.env
+    ports:
+      - ${MYSQL_ADDRESS:-3306}
+    restart: on-failure
+    volumes:
+      - ./data/db:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      timeout: 20s
+      retries: 5
+    mem_limit: <ram>
+    cpus: <cpu>
+  panel:
+    depends_on:
+      cache:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+    env_file: ./configs/panel.env
+    image: ferks/pterodactyl-container:latest
+    ports:
+      - 80:80
+      - 443:443
+    restart: on-failure
+    volumes:
+      - ./data/panel:/data
+      - ./configs/letsencrypt:/etc/letsencrypt
+      - ./configs/letsencrypt/webroot/.well-known:/var/www/html/public/.well-known
+      - ./configs/certs:/etc/certs
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.panel-reload.schedule: "${PANEL_RELOAD_SCHEDULE:-0 15 0 * * *}"
+      ofelia.job-exec.panel-reload.command: "nginx -s reload"
+    mem_limit: <ram>
+    cpus: <cpu>
+  worker:
+    command: wait-for -t 5 panel:80 -- php /var/www/html/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
+    depends_on:
+      panel:
+        condition: service_started
+    env_file: ./configs/panel.env
+    image: ferks/pterodactyl-container:latest
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.pqueue.schedule: "@every 1m"
+      ofelia.job-exec.pqueue.command: "php /var/www/html/artisan schedule:run"
+      ofelia.job-exec.pqueue.user: "nginx"
+    restart: always
+    volumes_from:
+      - panel
+    mem_limit: <ram>
+    cpus: <cpu>
+  cron:
+    command: daemon --docker
+    depends_on:
+      panel:
+        condition: service_started
+      worker:
+        condition: service_started
+      certbot:
+        condition: service_started
+      daemon:
+        condition: service_started
+    image: docker.io/mcuadros/ofelia:latest
+    network_mode: none
+    privileged: true
+    restart: always
+    volumes:
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:${DOCKER_SOCKET:-/var/run/docker.sock}
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-run.le-renew.schedule: "0 0 0 * * *"
+      ofelia.job-run.le-renew.container: pterodactyl_certbot_1
+    mem_limit: <ram>
+    cpus: <cpu>
+  cache:
+    image: docker.io/library/redis:alpine
+    restart: always
+    mem_limit: <ram>
+    cpus: <cpu>
+  certbot:
+    command: renew
+    depends_on:
+      panel:
+        condition: service_started
+    image: docker.io/certbot/certbot:latest
+    volumes_from:
+      - panel
+    mem_limit: <ram>
+    cpus: <cpu>
+ # daemon:
+ #   environment:
+ #     - TZ=${DAEMON_TIMEZONE:-UTC}
+ #   image: docker.io/ccarney16/pterodactyl-daemon:latest
+ #   ports:
+ #     - 2022:2022
+ #     - 8080:8080
+ #   privileged: true
+ #   restart: always
+ #   volumes:
+ #     - ${DAEMON_DATA_DIRECTORY:-/var/lib/pterodactyl}:${DAEMON_DATA_DIRECTORY:-/var/lib/pterodactyl}
+ #     - ${DOCKER_SOCKET:-/var/run/docker.sock}:${DOCKER_SOCKET:-/var/run/docker.sock}
+ #     - /tmp/pterodactyl/:/tmp/pterodactyl/
+ #     - ./configs/daemon:/etc/pterodactyl
+ #     - ./configs/letsencrypt:/etc/letsencrypt:ro
+ #     - ./configs/certs:/etc/certs:ro
+ #   working_dir: ${DAEMON_DATA_DIRECTORY:-/var/lib/pterodactyl}
+ #   labels:
+ #     ofelia.enabled: "true"
+ #     ofelia.job-exec.daemon-reload.schedule: "${DAEMON_RELOAD_SCHEDULE:-0 30 0 * * *}"
+ #     ofelia.job-exec.daemon-reload.command: "kill -15 1"
+ 
