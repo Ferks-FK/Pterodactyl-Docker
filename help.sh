@@ -143,6 +143,7 @@ system_input "Manane System"
 read -r OPT
 case "$OPT" in
   0)
+    clear
     DISPLAY_MENU=true
     inicial_menu
   ;;
