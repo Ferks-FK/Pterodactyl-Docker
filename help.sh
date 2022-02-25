@@ -69,18 +69,18 @@ RESET="\e[0m"
 
 inicial_menu() {
 if [ "$DISPLAY_MENU" == true ]; then
-  echo
-  print_brake 70
-  echo -e "* Welcome to the ${GREEN}Pterodactyl-Docker${RESET} help menu"
-  echo "* Select a help option:"
-  echo -ne "
-  * ${GREEN}-l, -L${RESET}    List all commands for managing your containers
-  * ${GREEN}-m, -M${RESET}    Manage your existing containers
-  * ${GREEN}-w, -W${RESET}    Show link to official wiki
-  * ${GREEN}-q, -Q${RESET}    Quit help menu
-  "
-  DISPLAY_MENU=false
-  print_brake 70
+echo
+print_brake 70
+echo -e "* Welcome to the ${GREEN}Pterodactyl-Docker${RESET} help menu"
+echo "* Select a help option:"
+echo -ne "
+* ${GREEN}-l, -L${RESET}    List all commands for managing your containers
+* ${GREEN}-m, -M${RESET}    Manage your existing containers
+* ${GREEN}-w, -W${RESET}    Show link to official wiki
+* ${GREEN}-q, -Q${RESET}    Quit help menu
+"
+DISPLAY_MENU=false
+print_brake 70
 fi
 system_input "Help Menu"
 read -r OPT
@@ -122,17 +122,17 @@ inicial_menu
 
 manage_containers() {
 if [ "$DISPLAY_MENU" == true ]; then
-  echo
-  echo "* What would you like to make? "
-  echo -ne "
-  [${YELLOW}0${RESET}]    Back to the main menu
-  [${YELLOW}1${RESET}]    Start all containers
-  [${YELLOW}2${RESET}]    Stop all containers
-  [${YELLOW}3${RESET}]    Restart all containers
-  [${YELLOW}4${RESET}]    Stop and remove all containers (You won't lose any data)
-  [${YELLOW}5${RESET}]    Delete all containers, and remove all data (${YELLOW}You will lose everything when using this option, so make sure you have a backup!${RESET})
-  "
-  DISPLAY_MENU=false
+echo
+echo "* What would you like to make? "
+echo -ne "
+[${YELLOW}0${RESET}]    Back to the main menu
+[${YELLOW}1${RESET}]    Start all containers
+[${YELLOW}2${RESET}]    Stop all containers
+[${YELLOW}3${RESET}]    Restart all containers
+[${YELLOW}4${RESET}]    Stop and remove all containers (You won't lose any data)
+[${YELLOW}5${RESET}]    Delete all containers, and remove all data (${YELLOW}You will lose everything when using this option, so make sure you have a backup!${RESET})
+"
+DISPLAY_MENU=false
 fi
 cd "/var/pterodactyl" || cd "/var/daemon"
 system_input "Manane System"
