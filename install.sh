@@ -547,6 +547,7 @@ echo -ne "
 2) Install a new node (${YELLOW}Installs only a new node for an existing panel${RESET})
 3) Exit
 "
+system_input "Inicial Choose"
 read -r INICIAL_CHOOSE
 case "$INICIAL_CHOOSE" in
   1)
