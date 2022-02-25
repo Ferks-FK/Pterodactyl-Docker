@@ -179,7 +179,7 @@ case "$OPT" in
     fi
     ;;
   5)
-    docker compose down -v &>/dev/null
+    docker compose down -v
     rm -rf /var/pterodactyl/data
     rm -rf /var/pterodactyl/configs/daemon/config.yml
     if docker compose down -v &>/dev/null; then
