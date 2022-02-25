@@ -10,8 +10,6 @@ This is a [Pterodactyl](https://pterodactyl.io) installation script for [Docker]
 This script installs Pterodactyl and its necessary utilities, and also manages what is already installed.
 <br>
 
-<img src="https://user-images.githubusercontent.com/69549678/150687469-2c3f57c0-765d-4460-9b37-369213f97ee7.PNG"></img>
-
 
 <h1 align="center">Support</h1>
 
