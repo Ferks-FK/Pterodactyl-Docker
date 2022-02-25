@@ -134,7 +134,11 @@ echo -ne "
 "
 DISPLAY_MENU=false
 fi
-cd "/var/pterodactyl" || cd "/var/daemon"
+if [ -d "/var/pterodactyl" ]; then
+    cd "/var/pterodactyl"
+  else
+    cd "/var/daemon"
+fi
 system_input "Manane System"
 read -r OPT
 case "$OPT" in
