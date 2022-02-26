@@ -14,9 +14,17 @@ set -e
 #
 ########################################################
 
-# Variables #
+# Get the latest version before running the script #
+get_release() {
+curl --silent \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/Ferks-FK/Pterodactyl-Docker/releases/latest |
+  grep '"tag_name":' |
+  sed -E 's/.*"([^"]+)".*/\1/'
+}
 
-SCRIPT_RELEASE="development"
+# Variables #
+SCRIPT_RELEASE="$(get_release)"
 SUPPORT_LINK="https://discord.gg/buDBbSGJmQ"
 GITHUB_URL="https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/$SCRIPT_RELEASE"
 CONFIGURE_SSL=false
@@ -171,13 +179,6 @@ check_distro() {
 
   OS=$(echo "$OS" | awk '{print tolower($0)}')
   OS_VER_MAJOR=$(echo "$OS_VER" | cut -d. -f1)
-  print "Your OS is: $OS $OS_VER"
-  echo -n "* Is that correct? (y/N): "
-  read -r CORRECT_OS
-  if [[ "$CORRECT_OS" =~ [Nn] ]]; then
-    print_error "Installation aborted!"
-    exit 1
-  fi
 }
 
 check_compatibility() {
@@ -207,10 +208,10 @@ case "$OS" in
 esac
 
 if [ "$SUPPORTED" == true ]; then
-        print "$OS $OS_VER is supported!"
-    else
-        echo "$OS $OS_VER is not supported!"
-        exit 1
+    print "$OS $OS_VER is supported!"
+  else
+    echo "$OS $OS_VER is not supported!"
+    exit 1
 fi
 }
 
@@ -430,10 +431,10 @@ mkdir -p /var/pterodactyl \
 /var/pterodactyl/configs/letsencrypt/renewal-hooks/deploy \
 /var/pterodactyl/configs/letsencrypt/renewal-hooks/post \
 /var/pterodactyl/configs/letsencrypt/renewal-hooks/pre
-curl -so /var/pterodactyl/docker-compose.example.yml $GITHUB_URL/docker/docker-compose.example.yml
-curl -so /var/pterodactyl/configs/mariadb.env $GITHUB_URL/configs/mariadb.env
-curl -so /var/pterodactyl/configs/panel.env $GITHUB_URL/configs/panel.env
-curl -so /var/pterodactyl/configs/letsencrypt/cli.ini $GITHUB_URL/configs/cli.ini
+curl -so /var/pterodactyl/docker-compose.example.yml "$GITHUB_URL"/docker/docker-compose.example.yml
+curl -so /var/pterodactyl/configs/mariadb.env "$GITHUB_URL"/configs/mariadb.env
+curl -so /var/pterodactyl/configs/panel.env "$GITHUB_URL"/configs/panel.env
+curl -so /var/pterodactyl/configs/letsencrypt/cli.ini "$GITHUB_URL"/configs/cli.ini
 }
 
 configure_environment() {
@@ -554,7 +555,7 @@ case "$INICIAL_CHOOSE" in
     main
   ;;
   2)
-    bash <(curl -s $GITHUB_URL/install_node.sh)
+    bash <(curl -s "$GITHUB_URL"/install_node.sh)
   ;;
   3)
     echo "Bye!"
@@ -597,7 +598,7 @@ if [ -d "/var/www/pterodactyl" ]; then
   elif [ -d "/var/pterodactyl" ]; then
     print_warning "You have already used this script to install pterodactyl docker, you cannot install it again."
     echo -e "* Running a help script..."
-    bash <(curl -s $GITHUB_URL/help.sh)
+    bash <(curl -s "$GITHUB_URL"/help.sh)
 fi
 
 # Exec Check Distro #

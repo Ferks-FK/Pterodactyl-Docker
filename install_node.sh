@@ -13,9 +13,17 @@ set -e
 #
 ########################################################
 
-# Variables #
+# Get the latest version before running the script #
+get_release() {
+curl --silent \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/Ferks-FK/Pterodactyl-Docker/releases/latest |
+  grep '"tag_name":' |
+  sed -E 's/.*"([^"]+)".*/\1/'
+}
 
-SCRIPT_RELEASE="development"
+# Variables #
+SCRIPT_RELEASE="$(get_release)"
 SUPPORT_LINK="https://discord.gg/buDBbSGJmQ"
 GITHUB_URL="https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/$SCRIPT_RELEASE"
 LINK_WIKI="https://github.com/Ferks-FK/Pterodactyl-Docker/wiki"
@@ -93,13 +101,6 @@ check_distro() {
 
   OS=$(echo "$OS" | awk '{print tolower($0)}')
   OS_VER_MAJOR=$(echo "$OS_VER" | cut -d. -f1)
-  print "Your OS is: $OS $OS_VER"
-  echo -n "* Is that correct? (y/N): "
-  read -r CORRECT_OS
-  if [[ "$CORRECT_OS" =~ [Nn] ]]; then
-    print_error "Installation aborted!"
-    exit 1
-  fi
 }
 
 check_compatibility() {
@@ -129,10 +130,10 @@ case "$OS" in
 esac
 
 if [ "$SUPPORTED" == true ]; then
-        print "$OS $OS_VER is supported!"
-    else
-        echo "$OS $OS_VER is not supported!"
-        exit 1
+    print "$OS $OS_VER is supported!"
+  else
+    echo "$OS $OS_VER is not supported!"
+    exit 1
 fi
 }
 
@@ -244,8 +245,8 @@ mkdir -p /var/daemon \
 /var/daemon/configs/letsencrypt/renewal-hooks/deploy \
 /var/daemon/configs/letsencrypt/renewal-hooks/post \
 /var/daemon/configs/letsencrypt/renewal-hooks/pre
-curl -so /var/daemon/node-only.example.yml $GITHUB_URL/docker/node-only.example.yml
-curl -so /var/daemon/configs/letsencrypt/cli.ini $GITHUB_URL/configs/cli.ini
+curl -so /var/daemon/node-only.example.yml "$GITHUB_URL"/docker/node-only.example.yml
+curl -so /var/daemon/configs/letsencrypt/cli.ini "$GITHUB_URL"/configs/cli.ini
 }
 
 configure_firewall() {
@@ -328,7 +329,7 @@ if [ -d "/var/www/pterodactyl" ]; then
   elif [ -d "/var/daemon" ]; then
     print_warning "You have already used this script to install daemon docker, you cannot install it again."
     echo -e "* Running a help script..."
-    bash <(curl -s $GITHUB_URL/help.sh)
+    bash <(curl -s "$GITHUB_URL"/help.sh)
 fi
 
 # Exec Check Distro #
