@@ -358,7 +358,6 @@ echo
 print_brake 40
 echo
 echo -e "* Hostname/FQDN: $FQDN"
-[ "$CONFIGURE_SSL" == true ] && echo -e "* Email Certificate: $EMAIL"
 [ "$CONFIGURE_SSL" == true ] && echo -e "* Configure SSL: $CONFIGURE_SSL"
 echo
 print_brake 40
