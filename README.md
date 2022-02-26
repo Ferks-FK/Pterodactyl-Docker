@@ -21,7 +21,7 @@ If you have any problems with the script, ask for support in our official [Suppo
 Just run the following command as root user.
 
 ```
-bash <(curl -s https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/development/install.sh)
+bash <(curl -s https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/v1.0.0/install.sh)
 ```
 <h1 align="center">Attention!</h1>
 
