@@ -22,8 +22,17 @@ curl --silent \
   sed -E 's/.*"([^"]+)".*/\1/'
 }
 
+get_docker_release() {
+curl --silent \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/docker/compose/releases/latest |
+  grep '"tag_name":' |
+  sed -E 's/.*"([^"]+)".*/\1/'
+}
+
 # Variables #
 SCRIPT_RELEASE="$(get_release)"
+DOCKER_COMPOSE="$(get_docker_release)"
 SUPPORT_LINK="https://discord.gg/buDBbSGJmQ"
 GITHUB_URL="https://raw.githubusercontent.com/Ferks-FK/Pterodactyl-Docker/$SCRIPT_RELEASE"
 LINK_WIKI="https://github.com/Ferks-FK/Pterodactyl-Docker/wiki"
@@ -190,9 +199,6 @@ fi
 deps_debian() {
 print "Installing dependencies for Debian ${OS_VER}"
 
-mkdir -p ~/.docker/cli-plugins/
-curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins
-chmod +x /usr/local/lib/docker/cli-plugins
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
 "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
@@ -200,14 +206,14 @@ $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update -y
 apt-get install -y ca-certificates curl gnupg lsb-release
 apt-get install -y docker-ce docker-ce-cli
+curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 }
 
 deps_ubuntu() {
 print "Installing dependencies for Ubuntu ${OS_VER}"
 
-mkdir -p ~/.docker/cli-plugins/
-curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins
-chmod +x /usr/local/lib/docker/cli-plugins
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
 "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
@@ -215,18 +221,21 @@ $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update -y
 apt-get install -y ca-certificates curl gnupg lsb-release
 apt-get install -y docker-ce docker-ce-cli
+curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 }
 
 deps_centos() {
 print "Installing dependencies for Centos ${OS_VER}"
 
-mkdir -p ~/.docker/cli-plugins/
 yum install -y yum-utils
-curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins
-chmod +x /usr/local/lib/docker/cli-plugins
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 yum-config-manager -y --enable docker-ce-nightly --now
 yum install docker-ce docker-ce-cli
+curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 }
 
 download_essencial_files() {
