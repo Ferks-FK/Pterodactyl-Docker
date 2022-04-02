@@ -291,7 +291,7 @@ if [ -d "/etc/letsencrypt/live/$FQDN" ]; then
     print_warning "There is already an SSL certificate for this domain!"
   else
     cd "/var/pterodactyl"
-    sudo docker compose run --rm --service-ports certbot certonly -d "$FQDN"
+    sudo docker-compose run --rm --service-ports certbot certonly -d "$FQDN"
 fi
 }
 
@@ -392,9 +392,11 @@ $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update -y
 apt-get install -y ca-certificates curl gnupg lsb-release
 apt-get install -y docker-ce docker-ce-cli
-curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+if ! docker-compose &>/dev/null; then
+  curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+  ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+fi
 }
 
 deps_ubuntu() {
@@ -407,9 +409,11 @@ $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update -y
 apt-get install -y ca-certificates curl gnupg lsb-release
 apt-get install -y docker-ce docker-ce-cli
-curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+if ! docker-compose &>/dev/null; then
+  curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+  ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+fi
 }
 
 deps_centos() {
@@ -419,9 +423,11 @@ yum install -y yum-utils
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 yum-config-manager -y --enable docker-ce-nightly --now
 yum install docker-ce docker-ce-cli
-curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+if ! docker-compose &>/dev/null; then
+  curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+  ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+fi
 }
 
 download_essencial_files() {
@@ -476,7 +482,7 @@ mv docker-compose.example.yml docker-compose.yml
 create_user_login() {
 print "Creating user access for the panel..."
 
-docker compose exec panel php artisan p:user:make \
+docker-compose exec panel php artisan p:user:make \
   --email="$EMAIL" \
   --username="$USERNAME" \
   --name-first="$FIRSTNAME" \
@@ -523,7 +529,7 @@ if [ -f "/var/pterodactyl/ready.txt" ]; then
 fi
 if docker exec -it pterodactyl-panel-1 test -f ready.txt; then
   cd "/var/pterodactyl"
-  sudo docker compose exec panel rm ready.txt
+  sudo docker-compose exec panel rm ready.txt
 fi
 }
 
@@ -533,7 +539,7 @@ print_warning "This process may take a few minutes, please do not cancel it."
 sleep 2
 
 cd "/var/pterodactyl"
-sudo docker compose up --build -d
+sudo docker-compose up --build -d
 
 while ! [ -f "/var/pterodactyl/ready.txt" ]; do
   sleep 2
